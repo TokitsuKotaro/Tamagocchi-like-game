@@ -20,9 +20,24 @@
 
 詳細は [docs/DESIGN.md](docs/DESIGN.md) を参照してください。
 
+## 🛠️ フロントエンド開発
+
+```bash
+cd frontend
+npm install
+npm run dev        # 開発サーバー
+npm test           # Vitest（進化ロジックのユニットテスト）
+npm run typecheck  # tsc --noEmit
+npm run lint       # oxlint
+npm run build      # 本番ビルド（PWA: Service Worker / manifest 生成）
+npm run preview    # ビルド成果物のプレビュー
+```
+
+Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定すると Phase 3 の Lambda Function URL 実装へ切り替わります。
+
 ## 🚀 開発の進め方（ロードマップ）
 - [x] 要件定義・キャラクター進化ツリー設計
-- [ ] Phase 1: フロントエンド単体（localStorage版）の構築・PWA化
+- [x] Phase 1: フロントエンド単体（localStorage版）の構築・PWA化
 - [ ] Phase 2: キャラクター画像（14種）＋背景画像（3種）の差し替え
 - [ ] Phase 3: AWSバックエンド（Lambda + DynamoDB）構築・API連携
 - [ ] Phase 4: S3 + CloudFront デプロイ
