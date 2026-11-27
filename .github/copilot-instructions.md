@@ -7,7 +7,7 @@
 
 ## 2. 技術スタック
 - **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS + `vite-plugin-pwa`
-- **Backend**: AWS Lambda (Python 3.12) + Lambda Function URLs + Amazon DynamoDB (`boto3`)
+- **Backend**: AWS Lambda (Python 3.12) + Amazon API Gateway (REST API) + Amazon DynamoDB (`boto3`)
 - **Hosting**: Amazon S3 + CloudFront
 - **Testing**: Vitest (Frontend) / pytest (Backend)
 
@@ -24,7 +24,7 @@
 - **型定義**: `src/types/pet.ts` にDynamoDBのモデルと一致する型定義を集約し、`any` 型の使用を禁止する。
 - **ストレージの抽象化**: データの読み書きは `src/services/petRepository.ts` に抽象化する。
   - Phase 1（オフライン版）では `localStorage` 実装を使う。
-  - Phase 3（AWS連携版）では環境変数 `VITE_API_BASE_URL` の有無で `fetch`（Lambda Function URL）実装へ切り替えられるようにする。
+  - Phase 3?AWS?????????? `VITE_API_BASE_URL` ???? `fetch`?API Gateway?????????????????
 - **画像アセットとフォールバック**:
   - キャラクター画像は `/assets/characters/{speciesId}.png`、背景画像は `/assets/backgrounds/{theme}.png` を参照する。
   - 画像の読み込みに失敗した場合（未作成時など）は、壊れた画像アイコンを表示せず、仮のSVGまたは絵文字＋キャラ名でフォールバック表示すること。
@@ -37,7 +37,7 @@
 - **DynamoDBの注意点**:
   - `boto3` の `Decimal` 型とJSONの `int` / `float` の変換エラーを防ぐため、専用のシリアライザ／デシリアライザを用意すること。
   - 定期バッチは使わず、リクエスト時の `now - lastUpdatedAt` による遅延評価でステータスを更新すること。
-- **CORS対応**: Lambda Function URL からのレスポンスには適切なCORSヘッダを含めること。
+- **CORS??**: API Gateway ? CORS ???????????????????????Lambda ??????????????CORS??????????
 
 ## 6. テスト・品質ルール
 - `backend/evolution.py` の時間経過・進化分岐（全14種）については、必ず `pytest` で網羅的なユニットテストを書くこと。

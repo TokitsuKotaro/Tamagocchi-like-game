@@ -1,4 +1,4 @@
-"""Lambda Function URL ハンドラ。
+"""API Gateway REST API ?????
 
 Routes:
   GET  /pet?userId={id}  現在の状態を取得（遅延評価を実行して保存）
