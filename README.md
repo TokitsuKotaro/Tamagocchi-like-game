@@ -90,10 +90,39 @@ Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定す
    | `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::123456789012:role/github-actions-deploy` | 上記で作成したロールの ARN（**必須**） |
    | `AWS_REGION` | `ap-northeast-1` | デプロイ先リージョン（省略時 `ap-northeast-1`） |
    | `SAM_STACK_NAME` | `henshin-tamago` | CloudFormation スタック名（省略時 `henshin-tamago`） |
+   | `DOMAIN_NAME` | `henshin-tamago.fens77.com` | 独自ドメイン（省略時は CloudFront のデフォルトドメイン） |
+   | `ACM_CERTIFICATE_ARN` | `arn:aws:acm:us-east-1:123456789012:certificate/xxxx` | `DOMAIN_NAME` を設定する場合は必須（**us-east-1** の証明書） |
 
 3. **GitHub の `production` Environment は不要です**（このワークフローは Environment を使いません）。承認ルールを付けたい場合は、`deploy.yml` の `deploy` ジョブに `environment: production` を追加し、IAM ロールの信頼条件を `repo:TokitsuKotaro/Tamagocchi-like-game:environment:production` に変更してください。
 
 4. `main` へマージすると自動デプロイされます。手動実行は Actions タブ → `Deploy to AWS` → `Run workflow`。
+
+### 独自ドメイン（例: `henshin-tamago.fens77.com`）を使う場合
+
+CloudFront で独自ドメインを使うには、**us-east-1 リージョンの ACM 証明書**が必要です（CloudFront の仕様）。DNS は ConoHa WING のものをそのまま使えます。
+
+1. **ACM 証明書を作成（us-east-1）**
+   - AWS コンソール右上のリージョンを **バージニア北部 (us-east-1)** に切り替える
+   - ACM → 証明書をリクエスト → パブリック証明書 → ドメイン名に `henshin-tamago.fens77.com` を入力
+   - 検証方法は **DNS 検証** を選択
+   - 発行された CNAME レコード（`_xxxx.henshin-tamago.fens77.com` → `_yyyy.acm-validations.aws`）を ConoHa WING の DNS に追加
+   - ステータスが「発行済み」になるまで待つ（通常数分〜30分）
+
+2. **GitHub の Variables に登録**
+   - `DOMAIN_NAME` = `henshin-tamago.fens77.com`
+   - `ACM_CERTIFICATE_ARN` = 上記証明書の ARN（`arn:aws:acm:us-east-1:...`）
+
+3. **`main` へマージ**すると、CloudFront に `Aliases` と `ViewerCertificate` が設定されます。
+
+4. **ConoHa WING の DNS に CNAME レコードを追加**
+   - ホスト名: `henshin-tamago`
+   - タイプ: `CNAME`
+   - 値: デプロイ後の CloudFront ドメイン名（例: `d155laa9n9bzlj.cloudfront.net`）
+   - ※ CloudFront のドメイン名は Actions の Summary、または CloudFormation スタックの `CloudFrontDomainName` 出力で確認できます
+
+5. 数分〜数十分で `https://henshin-tamago.fens77.com` でアクセスできるようになります。
+
+> **注意**: `DOMAIN_NAME` を設定したのに `ACM_CERTIFICATE_ARN` が空、または証明書が us-east-1 以外にある場合、CloudFront の更新が失敗します。
 
 ### デプロイの流れ
 1. `test` ジョブ: フロントエンド（typecheck / lint / Vitest / build 用依存）とバックエンド（pytest）を検証

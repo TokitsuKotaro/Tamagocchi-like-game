@@ -102,6 +102,9 @@ jobs:
           --region ${{ env.AWS_REGION }}
           --capabilities CAPABILITY_IAM
           --resolve-s3
+          --parameter-overrides
+          DomainName=${{ vars.DOMAIN_NAME }}
+          AcmCertificateArn=${{ vars.ACM_CERTIFICATE_ARN }}
           --no-confirm-changeset
           --no-fail-on-empty-changeset
 
@@ -116,7 +119,7 @@ jobs:
           echo "api_url=$(echo "$outputs" | jq -r '.[] | select(.OutputKey=="ApiFunctionUrl") | .OutputValue')" >> "$GITHUB_OUTPUT"
           echo "bucket=$(echo "$outputs" | jq -r '.[] | select(.OutputKey=="FrontendBucketName") | .OutputValue')" >> "$GITHUB_OUTPUT"
           echo "distribution_id=$(echo "$outputs" | jq -r '.[] | select(.OutputKey=="CloudFrontDistributionId") | .OutputValue')" >> "$GITHUB_OUTPUT"
-          echo "site_url=$(echo "$outputs" | jq -r '.[] | select(.OutputKey=="CloudFrontDomainName") | .OutputValue')" >> "$GITHUB_OUTPUT"
+          echo "site_url=$(echo "$outputs" | jq -r '.[] | select(.OutputKey=="SiteUrl") | .OutputValue')" >> "$GITHUB_OUTPUT"
 
       - name: Install frontend dependencies
         working-directory: frontend

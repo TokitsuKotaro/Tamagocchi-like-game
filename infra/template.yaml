@@ -13,6 +13,21 @@ Parameters:
     AllowedValues:
       - prod
       - dev
+  DomainName:
+    Type: String
+    Default: ''
+    Description: >-
+      Custom domain for the frontend (e.g. henshin-tamago.fens77.com).
+      Leave empty to use the default CloudFront domain.
+  AcmCertificateArn:
+    Type: String
+    Default: ''
+    Description: >-
+      ARN of an ACM certificate in us-east-1 covering DomainName.
+      Required when DomainName is set.
+
+Conditions:
+  HasCustomDomain: !Not [!Equals [!Ref DomainName, '']]
 
 Globals:
   Function:
@@ -123,6 +138,16 @@ Resources:
         DefaultRootObject: index.html
         HttpVersion: http2and3
         PriceClass: PriceClass_200
+        Aliases: !If
+          - HasCustomDomain
+          - - !Ref DomainName
+          - !Ref AWS::NoValue
+        ViewerCertificate: !If
+          - HasCustomDomain
+          - AcmCertificateArn: !Ref AcmCertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - !Ref AWS::NoValue
         Origins:
           - Id: S3Origin
             DomainName: !GetAtt FrontendBucket.RegionalDomainName
@@ -170,3 +195,9 @@ Outputs:
   CloudFrontDomainName:
     Description: CloudFront domain name (public URL of the app)
     Value: !Sub 'https://${CloudFrontDistribution.DomainName}'
+  SiteUrl:
+    Description: Public URL of the app (custom domain when configured, otherwise CloudFront domain)
+    Value: !If
+      - HasCustomDomain
+      - !Sub 'https://${DomainName}'
+      - !Sub 'https://${CloudFrontDistribution.DomainName}'
