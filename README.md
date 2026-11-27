@@ -20,6 +20,15 @@
 
 詳細は [docs/DESIGN.md](docs/DESIGN.md) を参照してください。
 
+## 🛠️ バックエンド開発
+
+```bash
+pip install -r backend/requirements-dev.txt
+python -m pytest backend -q   # 進化ロジックのユニットテスト
+```
+
+`backend/evolution.py` はフロントエンドの `frontend/src/services/evolution.ts` と同一仕様の純粋関数です。
+
 ## 🛠️ フロントエンド開発
 
 ```bash
@@ -35,9 +44,76 @@ npm run preview    # ビルド成果物のプレビュー
 
 Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定すると Phase 3 の Lambda Function URL 実装へ切り替わります。
 
+## 🚀 デプロイ（GitHub Actions → AWS）
+
+`main` ブランチへマージ（push）すると、GitHub Actions が自動で AWS へデプロイします。
+
+- ワークフロー: [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
+- インフラ定義（AWS SAM）: [infra/template.yaml](infra/template.yaml)
+- バックエンド（Lambda + DynamoDB）: [backend/](backend/)
+
+### デプロイされるもの
+| リソース | 内容 |
+| :--- | :--- |
+| DynamoDB `HenshinTamagoTable` | Provisioned 1 RCU / 1 WCU、PITR 無効（無料枠内） |
+| Lambda `henshin-tamago-api-prod` | Python 3.12、Lambda Function URL（CORS 有効） |
+| S3 バケット | フロントエンドの静的ホスティング（非公開・OAC 経由のみ） |
+| CloudFront | HTTPS 配信、403/404 → `index.html`（SPA フォールバック） |
+
+### 初回セットアップ（1回だけ手動）
+
+1. **AWS 側に OIDC プロバイダとデプロイ用 IAM ロールを作成**
+   - IAM → ID プロバイダ → `token.actions.githubusercontent.com` を追加（Audience: `sts.amazonaws.com`）
+   - 以下の信頼ポリシーを持つ IAM ロールを作成（`<ACCOUNT_ID>` と `<OWNER>/<REPO>` を置き換え）:
+
+     ```json
+     {
+       "Version": "2012-10-17",
+       "Statement": [
+         {
+           "Effect": "Allow",
+           "Principal": { "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com" },
+           "Action": "sts:AssumeRoleWithWebIdentity",
+           "Condition": {
+             "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
+             "StringLike": { "token.actions.githubusercontent.com:sub": "repo:<OWNER>/<REPO>:*" }
+           }
+         }
+       ]
+     }
+     ```
+   - ロールには SAM デプロイに必要な権限を付与します（初回は `AdministratorAccess` が簡単です。絞る場合は CloudFormation / Lambda / DynamoDB / S3 / CloudFront / IAM（`CAPABILITY_IAM` 用）/ Logs の作成・更新権限が必要です）。
+
+2. **GitHub リポジトリの Settings → Secrets and variables → Actions → Variables** に以下を登録:
+   | 変数名 | 例 | 説明 |
+   | :--- | :--- | :--- |
+   | `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::123456789012:role/github-actions-deploy` | 上記で作成したロールの ARN（**必須**） |
+   | `AWS_REGION` | `ap-northeast-1` | デプロイ先リージョン（省略時 `ap-northeast-1`） |
+   | `SAM_STACK_NAME` | `henshin-tamago` | CloudFormation スタック名（省略時 `henshin-tamago`） |
+
+3. **GitHub の `production` Environment を作成**（Settings → Environments）。必要なら承認ルールを設定できます。
+
+4. `main` へマージすると自動デプロイされます。手動実行は Actions タブ → `Deploy to AWS` → `Run workflow`。
+
+### デプロイの流れ
+1. `test` ジョブ: フロントエンド（typecheck / lint / Vitest / build 用依存）とバックエンド（pytest）を検証
+2. `deploy` ジョブ: OIDC で AWS 認証 → `sam build` / `sam deploy` → スタック出力から `VITE_API_BASE_URL` を取得してフロントエンドをビルド → S3 へ同期 → CloudFront キャッシュを無効化
+
+### ローカルから手動デプロイする場合
+```bash
+aws configure   # デプロイ権限のある認証情報を設定
+sam build --template infra/template.yaml
+sam deploy --guided --template-file .aws-sam/build/template.yaml --capabilities CAPABILITY_IAM
+# 出力された ApiFunctionUrl を使ってフロントエンドをビルド
+cd frontend
+VITE_API_BASE_URL=<ApiFunctionUrl> npm run build
+aws s3 sync dist s3://<FrontendBucketName> --delete
+aws cloudfront create-invalidation --distribution-id <CloudFrontDistributionId> --paths '/*'
+```
+
 ## 🚀 開発の進め方（ロードマップ）
 - [x] 要件定義・キャラクター進化ツリー設計
 - [x] Phase 1: フロントエンド単体（localStorage版）の構築・PWA化
 - [ ] Phase 2: キャラクター画像（14種）＋背景画像（3種）の差し替え
-- [ ] Phase 3: AWSバックエンド（Lambda + DynamoDB）構築・API連携
-- [ ] Phase 4: S3 + CloudFront デプロイ
+- [x] Phase 3: AWSバックエンド（Lambda + DynamoDB）構築・API連携
+- [x] Phase 4: S3 + CloudFront デプロイ（GitHub Actions + SAM、`main` マージで自動デプロイ）

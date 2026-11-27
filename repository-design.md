@@ -2,7 +2,9 @@
 # リポジトリ構成
 Tamagocchi-like-game/
 ├── .github/
-│   └── copilot-instructions.md   # Copilot向けの開発ルール・前提知識
+│   ├── copilot-instructions.md   # Copilot向けの開発ルール・前提知識
+│   └── workflows/
+│       └── deploy.yml            # main マージで AWS へ自動デプロイ
 ├── docs/
 │   ├── DESIGN.md                 # 詳細設計書（DB・API・進化ロジック）
 │   └── images/
@@ -13,11 +15,16 @@ Tamagocchi-like-game/
 │   │   └── assets/               # キャラ透過PNG・背景画像
 │   └── src/
 ├── backend/                      # AWS Lambda (Python 3.12)
-│   ├── handler.py
-│   ├── evolution.py              # 進化・遅延評価ロジック
-│   └── requirements.txt
-├── infra/                        # AWS SAM または Terraform (IaC)
-│   └── template.yaml
+│   ├── handler.py                # Lambda Function URL ハンドラ（/pet, /pet/action, /pet/reset）
+│   ├── evolution.py              # 進化・遅延評価ロジック（純粋関数）
+│   ├── test_evolution.py         # pytest
+│   ├── requirements.txt
+│   └── requirements-dev.txt
+├── infra/                        # AWS SAM (IaC)
+│   └── template.yaml             # DynamoDB / Lambda + Function URL / S3 / CloudFront
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # main マージで AWS へ自動デプロイ
 └── README.md
 
 # FrontendはReactを使う

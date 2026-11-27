@@ -76,11 +76,10 @@ const apiRepository: PetRepository = {
   },
 
   async performAction(userId, action) {
-    const data = await apiFetch<PetData>('/pet/action', {
+    return apiFetch<ActionResult>('/pet/action', {
       method: 'POST',
       body: JSON.stringify({ userId, action }),
     })
-    return { data, evolved: false, previousSpeciesId: data.currentPet.speciesId }
   },
 
   async reset(userId) {
