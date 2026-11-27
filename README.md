@@ -91,7 +91,7 @@ Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定す
    | `AWS_REGION` | `ap-northeast-1` | デプロイ先リージョン（省略時 `ap-northeast-1`） |
    | `SAM_STACK_NAME` | `henshin-tamago` | CloudFormation スタック名（省略時 `henshin-tamago`） |
 
-3. **GitHub の `production` Environment を作成**（Settings → Environments）。必要なら承認ルールを設定できます。
+3. **GitHub の `production` Environment は不要です**（このワークフローは Environment を使いません）。承認ルールを付けたい場合は、`deploy.yml` の `deploy` ジョブに `environment: production` を追加し、IAM ロールの信頼条件を `repo:TokitsuKotaro/Tamagocchi-like-game:environment:production` に変更してください。
 
 4. `main` へマージすると自動デプロイされます。手動実行は Actions タブ → `Deploy to AWS` → `Run workflow`。
 
