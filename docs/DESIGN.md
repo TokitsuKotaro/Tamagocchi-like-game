@@ -1,7 +1,7 @@
 # 設計ドキュメント（DESIGN.md）
 
 ## 1. システム構成とコスト方針
-- API Gatewayは使用せず、**Lambda Function URLs**（CORS設定あり）でフロントエンドと通信する。
+- **Amazon API Gateway?REST API?** ??? Lambda ??????CORS??????
 - DynamoDBは永続無料枠（25 RCU / 25 WCU）に収めるため、**Provisioned Mode（RCU: 1, WCU: 1〜5）**、PITR無効で作成する。
 - 認証は簡易化のため、`userId`（例: `daughter-01`）をURLクエリまたはlocalStorageで保持し、リクエストヘッダ等で送信する。
 
@@ -40,7 +40,7 @@
 
 ---
 
-## 3. API 仕様（Lambda Function URL）
+## 3. API ???API Gateway REST API?
 
 | Method | Path | 概要 |
 | :--- | :--- | :--- |

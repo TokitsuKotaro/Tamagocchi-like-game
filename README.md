@@ -14,7 +14,7 @@
 個人・家族利用で月額ほぼ0円（AWS永続無料枠内）で運用する構成です。
 
 - **Frontend**: PWA (HTML/CSS/JS or React) hosted on **Amazon S3 + CloudFront**
-- **Backend**: **AWS Lambda (Python 3.12)** + **Lambda Function URLs**
+- **Backend**: **AWS Lambda (Python 3.12)** + **Amazon API Gateway (REST API)**
 - **Database**: **Amazon DynamoDB** (Provisioned Capacity: 無料枠内)
 - **時間経過処理**: 定期バッチを使わず、APIアクセス時のタイムスタンプ差分による**遅延評価**で計算。
 
@@ -42,7 +42,7 @@ npm run build      # 本番ビルド（PWA: Service Worker / manifest 生成）
 npm run preview    # ビルド成果物のプレビュー
 ```
 
-Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定すると Phase 3 の Lambda Function URL 実装へ切り替わります。
+Phase 1 ? `localStorage` ???????`VITE_API_BASE_URL` ?????? Phase 3 ? API Gateway ???????????
 
 ## 🚀 デプロイ（GitHub Actions → AWS）
 
@@ -56,7 +56,7 @@ Phase 1 は `localStorage` に保存します。`VITE_API_BASE_URL` を設定す
 | リソース | 内容 |
 | :--- | :--- |
 | DynamoDB `HenshinTamagoTable` | Provisioned 1 RCU / 1 WCU、PITR 無効（無料枠内） |
-| Lambda `henshin-tamago-api-prod` | Python 3.12、Lambda Function URL（CORS 有効） |
+| Lambda `henshin-tamago-api-prod` | Python 3.12?API Gateway REST API ???CORS ??? |
 | S3 バケット | フロントエンドの静的ホスティング（非公開・OAC 経由のみ） |
 | CloudFront | HTTPS 配信、403/404 → `index.html`（SPA フォールバック） |
 

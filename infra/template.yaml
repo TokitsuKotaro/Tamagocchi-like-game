@@ -63,24 +63,44 @@ Resources:
       FunctionName: !Sub '${ProjectName}-api-${StageName}'
       CodeUri: ../backend/
       Handler: handler.lambda_handler
-      Description: Henshin Tamago API (Lambda Function URL)
+      Description: Henshin Tamago API (API Gateway REST API)
       Environment:
         Variables:
           TABLE_NAME: !Ref HenshinTamagoTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref HenshinTamagoTable
-      FunctionUrlConfig:
-        AuthType: NONE
-        Cors:
-          AllowOrigins:
-            - '*'
-          AllowMethods:
-            - GET
-            - POST
-          AllowHeaders:
-            - Content-Type
-          MaxAge: 86400
+      Events:
+        GetPet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HenshinTamagoApi
+            Path: /pet
+            Method: get
+        PostPetAction:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HenshinTamagoApi
+            Path: /pet/action
+            Method: post
+        PostPetReset:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HenshinTamagoApi
+            Path: /pet/reset
+            Method: post
+
+  HenshinTamagoApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub '${ProjectName}-api-${StageName}'
+      StageName: !Ref StageName
+      EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+        MaxAge: "'86400'"
 
   FrontendBucket:
     Type: AWS::S3::Bucket
@@ -177,9 +197,12 @@ Resources:
             ErrorCachingMinTTL: 10
 
 Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint (set as VITE_API_BASE_URL when building the frontend)
+    Value: !Sub 'https://${HenshinTamagoApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
   ApiFunctionUrl:
-    Description: Lambda Function URL (set as VITE_API_BASE_URL when building the frontend)
-    Value: !GetAtt ApiFunctionUrl.FunctionUrl
+    Description: (Deprecated) Use ApiUrl instead
+    Value: !Sub 'https://${HenshinTamagoApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
   ApiFunctionName:
     Description: Lambda function name
     Value: !Ref ApiFunction

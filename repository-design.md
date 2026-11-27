@@ -15,13 +15,13 @@ Tamagocchi-like-game/
 │   │   └── assets/               # キャラ透過PNG・背景画像
 │   └── src/
 ├── backend/                      # AWS Lambda (Python 3.12)
-│   ├── handler.py                # Lambda Function URL ハンドラ（/pet, /pet/action, /pet/reset）
+?   ??? handler.py                # API Gateway ?????/pet, /pet/action, /pet/reset?
 │   ├── evolution.py              # 進化・遅延評価ロジック（純粋関数）
 │   ├── test_evolution.py         # pytest
 │   ├── requirements.txt
 │   └── requirements-dev.txt
 ├── infra/                        # AWS SAM (IaC)
-│   └── template.yaml             # DynamoDB / Lambda + Function URL / S3 / CloudFront
+?   ??? template.yaml             # DynamoDB / Lambda + API Gateway / S3 / CloudFront
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml            # main マージで AWS へ自動デプロイ
