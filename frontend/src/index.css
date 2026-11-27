@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cream: #fdf6ec;
+  --color-sand: #f7e8d0;
+  --color-sand-dark: #e8d3b5;
+  --color-wood: #d9b98f;
+  --color-ink: #6b4f3a;
+  --color-sea: #bfe3ec;
+  --color-land: #cfe8c8;
+  --color-magic: #e3d4f5;
+
+  --animate-float: float 3.2s ease-in-out infinite;
+  --animate-squish: squish 2.4s ease-in-out infinite;
+  --animate-jump: jump 0.6s ease-out;
+  --animate-heart-pop: heart-pop 1s ease-out forwards;
+  --animate-bubble-pop: bubble-pop 1.4s ease-out forwards;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-sparkle: sparkle 1.6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes squish {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(1.08, 0.92);
+  }
+  60% {
+    transform: scale(0.94, 1.06);
+  }
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  30% {
+    transform: translateY(0) scale(1.15, 0.85);
+  }
+  55% {
+    transform: translateY(-46px) scale(0.92, 1.1);
+  }
+  75% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@keyframes heart-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-90px) scale(1.4);
+  }
+}
+
+@keyframes bubble-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(1.2);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #efe0cd;
+  font-family:
+    'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo',
+    system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  user-select: none;
+}
