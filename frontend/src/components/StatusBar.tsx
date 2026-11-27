@@ -10,7 +10,7 @@ function RiceBall({ filled }: { filled: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`text-2xl leading-none transition-opacity ${filled ? 'opacity-100' : 'opacity-25 grayscale'}`}
+      className={`text-xl leading-none transition-opacity ${filled ? 'opacity-100' : 'opacity-25 grayscale'}`}
     >
       🍙
     </span>
@@ -21,7 +21,7 @@ function Heart({ filled }: { filled: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`text-2xl leading-none transition-opacity ${filled ? 'opacity-100' : 'opacity-25 grayscale'}`}
+      className={`text-xl leading-none transition-opacity ${filled ? 'opacity-100' : 'opacity-25 grayscale'}`}
     >
       ❤️
     </span>
@@ -30,9 +30,9 @@ function Heart({ filled }: { filled: boolean }) {
 
 export function StatusBar({ hunger, happiness, onOpenAdmin }: StatusBarProps) {
   return (
-    <header className="relative z-10 flex items-center justify-between gap-2 rounded-b-3xl border-b-4 border-[#e8d3b5] bg-[#f7e8d0]/95 px-3 pb-2 pt-3 shadow-sm">
-      <div className="flex items-center gap-1.5">
-        <span className="whitespace-nowrap rounded-full bg-white/80 px-2 py-1 text-xs font-bold text-[#6b4f3a] shadow-sm">
+    <header className="relative z-10 flex items-center justify-between gap-1 rounded-b-3xl border-b-4 border-[#e8d3b5] bg-[#f7e8d0]/95 px-2 pb-2 pt-3 shadow-sm">
+      <div className="flex items-center gap-1">
+        <span className="whitespace-nowrap rounded-full bg-white/80 px-1.5 py-1 text-[10px] font-bold text-[#6b4f3a] shadow-sm">
           おなか
         </span>
         <div className="flex items-center gap-0.5" aria-label={`おなか ${hunger}/${MAX_HUNGER}`}>
@@ -42,8 +42,8 @@ export function StatusBar({ hunger, happiness, onOpenAdmin }: StatusBarProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5">
-        <span className="whitespace-nowrap rounded-full bg-white/80 px-2 py-1 text-xs font-bold text-[#6b4f3a] shadow-sm">
+      <div className="flex items-center gap-1">
+        <span className="whitespace-nowrap rounded-full bg-white/80 px-1.5 py-1 text-[10px] font-bold text-[#6b4f3a] shadow-sm">
           きげん
         </span>
         <div className="flex items-center gap-0.5" aria-label={`きげん ${happiness}/${MAX_HAPPINESS}`}>
@@ -57,7 +57,7 @@ export function StatusBar({ hunger, happiness, onOpenAdmin }: StatusBarProps) {
         type="button"
         onClick={onOpenAdmin}
         aria-label="おとなよう せってい"
-        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-2xl shadow-sm transition-transform active:scale-90"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/70 text-xl shadow-sm transition-transform active:scale-90"
       >
         ⚙️
       </button>
